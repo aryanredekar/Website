@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Request a Quote</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* ================== THEME VARIABLES (same as index.html) ================== */
+:root{
+  --accent:#0b74de;
+  --accent-2:#0a5fb3;
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #0f1724;
+  --muted:#6b7280;
+  --card-shadow: 0 6px 18px rgba(12,18,30,0.04);
+  --radius:14px;
+  --contrast-border: rgba(12,18,30,0.05);
+
+  --text-on-image: #0f1724;
+  --text-on-image-shadow: 0 6px 20px rgba(0,0,0,0.40);
+
+  --theme-bg-transition: background-color 360ms ease, color 360ms ease;
+  --img-filter-light: brightness(.72) saturate(1);
+
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+:root[data-theme="dark"]{
+  --accent:#57a6ff;
+  --accent-2:#2b74d9;
+  --bg: linear-gradient(180deg,#071026 0%, #07182b 100%);
+  --surface: #071627;
+  --text: #e6eefc;
+  --muted:#9aa6bf;
+  --card-shadow: 0 8px 22px rgba(0,0,0,0.6);
+  --contrast-border: rgba(255,255,255,0.08);
+
+  --text-on-image: #e6eefc;
+  --text-on-image-shadow: 0 6px 20px rgba(0,0,0,0.65);
+
+  --img-filter-light: brightness(.56) saturate(.92) contrast(.98);
+}
+
+/* ========== BASE ========== */
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  transition:var(--theme-bg-transition);
+}
+a{color:inherit;text-decoration:none}
+.container{max-width:600px;margin:40px auto;padding:0 20px}
+
+/* ========== GLOBAL NAVBAR ========== */
+.global-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--contrast-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+}
+/* key: nav-container is single flex row that vertically centers children */
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 72px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;        /* vertical center */
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* left side (logo) */
+.nav-left {
+  display:flex;
+  align-items:center;
+  gap: 18px;
+}
+.nav-logo {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* center links (optional) */
+.nav-links {
+  display:flex;
+  align-items:center;
+  gap: 18px;
+  margin-left: 8px;
+  flex: 1; /* allow links to take available space so right controls align */
+}
+.nav-links a {
+  color: var(--muted);
+  font-weight: 600;
+}
+.nav-links a:hover { color: var(--accent); }
+
+/* right controls (theme toggle) */
+.nav-right {
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
+
+/* spacer under navbar so page content not hidden */
+.nav-spacer { height: 85px; }
+
+/* THEME TOGGLE (no dropdown) */
+.theme-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.theme-toggle {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--contrast-border);
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-label { font-size: 13px; margin-left: 8px; color: var(--muted); }
+
+/* ========== FORM STYLES ========== */
+.form-card {
+  background: var(--surface);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--contrast-border);
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+label {
+  font-weight: 600;
+  display: block;
+  margin-top: 15px;
+  color: var(--text);
+}
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid var(--contrast-border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+}
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 25px;
+  background: linear-gradient(180deg,var(--accent),var(--accent-2));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 8px 18px rgba(11,116,222,0.18);
+}
+button:hover { opacity: 0.95; }
+
+/* responsive tweaks */
+@media(max-width:980px){
+  .nav-links { display: none; } /* hide links on smaller screens for now */
+  .nav-container { padding: 0 16px; }
+  .container { margin: 24px 16px; }
+}
+@media(max-width:560px){
+  .nav-container { padding: 0 12px; }
+}
+</style>
+</head>
+<body class="theme-transition">
+
+<!-- GLOBAL NAVBAR -->
+<div class="global-header" role="banner">
+  <div class="nav-container" role="navigation" aria-label="Main">
+    <div class="nav-left">
+      <a class="nav-logo" href="index.html">Aryan Redekar • Dev</a>
+    </div>
+
+    <div class="nav-links" aria-label="Site links">
+      <a href="MasterLancer.html">Home</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#portfolio">Portfolio</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+
+    <div class="nav-right">
+        <!-- Theme toggle (no dropdown) -->
+        <div class="theme-controls" aria-hidden="false">
+          <button id="themeToggle" class="theme-toggle" aria-pressed="false" aria-label="Toggle theme">
+            <svg id="iconSun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4V2M12 22v-2M4.93 4.93L3.51 3.51M20.49 20.49l-1.42-1.42M2 12H4M20 12h2M4.93 19.07l1.42-1.42M20.49 3.51l-1.42 1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+
+            <svg id="iconMoon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <span id="toggleText" class="theme-label">Auto</span>
+          </button>
+        </div>
+      </div>
+  </div>
+</div>
+
+<div class="nav-spacer" aria-hidden="true"></div>
+
+<div class="container">
+  <div class="form-card">
+    <h2>Request a Quote</h2>
+
+    <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST">
+      <label>Full Name</label>
+      <input type="text" name="name" required>
+
+      <label>Email</label>
+      <input type="email" name="email" required>
+
+      <label>Mobile Number</label>
+      <input type="tel" name="mobile" pattern="[0-9]{10}" required>
+
+      <label>WhatsApp Number</label>
+      <input type="tel" name="whatsapp" pattern="[0-9]{10}">
+
+      <label>Service You Want</label>
+      <select name="service" required>
+        <option value="">Choose a service</option>
+        <option value="Website Development">Website Development</option>
+        <option value="Android App Development">Android App Development</option>
+        <option value="iOS App Development">iOS App Development</option>
+        <option value="Full Stack Development">Full Stack Development</option>
+        <option value="Backend/API Development">Backend/API Development</option>
+        <option value="E-commerce Website">E-commerce Website</option>
+        <option value="UI/UX Design">UI/UX Design</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <input type="hidden" name="_subject" value="New Quote Request">
+
+      <button type="submit">Submit Request</button>
+    </form>
+  </div>
+</div>
+
+<!-- THEME SCRIPT (toggle only; cycles Auto -> Light -> Dark -> Auto) -->
+<script>
+(function(){
+  const root = document.documentElement;
+  const THEME_KEY = "site-theme"; // 'auto' | 'light' | 'dark'
+  const toggleBtn = document.getElementById("themeToggle");
+  const toggleText = document.getElementById("toggleText");
+  const iconSun = document.getElementById("iconSun");
+  const iconMoon = document.getElementById("iconMoon");
+  const mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+
+  function systemPrefersDark(){ return mq && mq.matches; }
+  function getSaved(){ return localStorage.getItem(THEME_KEY) || "auto"; }
+  function save(v){ localStorage.setItem(THEME_KEY, v); }
+
+  function applyTheme(mode){
+    if(mode === "dark"){
+      root.setAttribute("data-theme","dark");
+      toggleText.textContent = "Dark";
+      iconSun.style.display = "none";
+      iconMoon.style.display = "block";
+      toggleBtn.setAttribute("aria-pressed","true");
+    } else {
+      root.removeAttribute("data-theme");
+      toggleText.textContent = "Light";
+      iconSun.style.display = "block";
+      iconMoon.style.display = "none";
+      toggleBtn.setAttribute("aria-pressed","false");
+    }
+  }
+
+  function updateDisplay(pref){
+    if(pref === "auto"){
+      applyTheme(systemPrefersDark() ? "dark" : "light");
+      toggleText.textContent = "Auto";
+    } else {
+      applyTheme(pref);
+    }
+  }
+
+  // init
+  const saved = getSaved();
+  updateDisplay(saved);
+
+  // toggle cycles Auto -> Light -> Dark -> Auto
+  toggleBtn.addEventListener("click", ()=>{
+    const cur = getSaved();
+    const next = cur === "auto" ? "light" : cur === "light" ? "dark" : "auto";
+    save(next);
+    updateDisplay(next);
+
+    // small icon animation
+    const visible = iconSun.style.display !== "none" ? iconSun : iconMoon;
+    visible.classList.remove("spin-anim");
+    void visible.offsetWidth;
+    visible.classList.add("spin-anim");
+  });
+
+  // respond to system changes when in auto mode
+  if (mq && mq.addEventListener) {
+    mq.addEventListener("change", ()=>{
+      if (getSaved() === "auto") updateDisplay("auto");
+    });
+  } else if (mq && mq.addListener) {
+    mq.addListener(()=>{
+      if (getSaved() === "auto") updateDisplay("auto");
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

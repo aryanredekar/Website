@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Thanks — Aryan Redekar</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:Inter,system-ui,Arial,Helvetica;background:#f3f6fb;margin:0;padding:30px}
+    .wrap{max-width:720px;margin:40px auto;background:#fff;padding:26px;border-radius:12px;box-shadow:0 8px 22px rgba(16,24,40,.06)}
+    h1{margin:0 0 8px}
+    p{color:#444;margin:8px 0}
+    .info{background:#f8fbff;border:1px solid #e6f0ff;padding:12px;border-radius:10px;margin-top:12px}
+    .btns{display:flex;gap:12px;margin-top:18px}
+    .btn{padding:12px 16px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+    .btn-primary{background:#0b74de;color:#fff}
+    .btn-secondary{background:#eef2f7;color:#111}
+    .note{color:#666;margin-top:10px}
+    .countdown{font-weight:700;color:#0b74de}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Thanks — your request is received!</h1>
+    <p>I've received your quote request. I'll review it and get back to you shortly.</p>
+
+    <div class="info" id="submittedInfo">
+      <!-- Filled by JS -->
+    </div>
+
+    <div style="margin-top:12px">
+      <p class="note">You will be redirected to WhatsApp in <span class="countdown" id="tick">5</span> seconds to start a chat (you can cancel).</p>
+      <div class="btns">
+        <button class="btn btn-primary" id="openNow">Open WhatsApp now</button>
+        <button class="btn btn-secondary" id="cancelBtn">Cancel redirect</button>
+      </div>
+    </div>
+
+    <p style="margin-top:18px;color:#666">If WhatsApp doesn't open automatically, click <strong>Open WhatsApp now</strong>. You can also return to the site or request changes.</p>
+  </div>
+
+  <script>
+    // Read query params
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name') || 'Friend';
+    const service = params.get('service') || 'Service';
+    const whatsapp = params.get('whatsapp') || '';
+
+    // Fill info box
+    const infoDiv = document.getElementById('submittedInfo');
+    infoDiv.innerHTML = '<strong>Name:</strong> ' + escapeHtml(name) +
+                        '<br><strong>Service:</strong> ' + escapeHtml(service) +
+                        (whatsapp ? '<br><strong>WhatsApp:</strong> ' + escapeHtml(whatsapp) : '');
+
+    // Build WhatsApp message and URL
+    const phoneCandidate = whatsapp.replace(/\D/g,''); // digits only
+    const message = `Hi ${name}, thanks for requesting a quote for "${service}". I will reply shortly. — Aryan`;
+    const encodedMessage = encodeURIComponent(message);
+
+    // Use user's whatsapp if they provided, else open to your WhatsApp number.
+    // IMPORTANT: Replace YOUR_WHATSAPP_NUMBER with your phone (country code no + or 0), e.g. 9198xxxxxxx
+    const YOUR_WHATSAPP_NUMBER = 'YOUR_WHATSAPP_NUMBER';
+
+    // If user provided their whatsapp number, open chat with *you* prefilled (so you send the first message) — else open chat to them?
+    // It's best for you (freelancer) to open a chat to the client's number:
+    let openTo = phoneCandidate || '';
+    if (!openTo) {
+      // fallback: open your own chat (so you can start conversation manually)
+      openTo = YOUR_WHATSAPP_NUMBER;
+    }
+    const whatsappURL = 'https://wa.me/' + openTo + '?text=' + encodedMessage;
+
+    // Countdown auto-redirect
+    let seconds = 5;
+    const tickEl = document.getElementById('tick');
+    const openNowBtn = document.getElementById('openNow');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    let timer = setInterval(()=>{
+      seconds--;
+      tickEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(timer);
+        window.open(whatsappURL, '_blank');
+      }
+    }, 1000);
+
+    cancelBtn.addEventListener('click', ()=>{
+      clearInterval(timer);
+      document.querySelector('.note').textContent = 'Redirect cancelled. Click "Open WhatsApp now" to start the chat manually.';
+    });
+
+    openNowBtn.addEventListener('click', ()=>{
+      window.open(whatsappURL, '_blank');
+    });
+
+    // small helper
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+  </script>
+</body>
+</html>
